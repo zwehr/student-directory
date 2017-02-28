@@ -43,13 +43,12 @@ public class StudentControllerServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		try {
-		// list the students ... in MVC fashion
+		// list the students
 		listStudents(request, response);
 		} catch (Exception exc) {
 			throw new ServletException(exc);
 		}
 	}
-
 
 	private void listStudents(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		//get students from db util
@@ -58,7 +57,7 @@ public class StudentControllerServlet extends HttpServlet {
 		//add students to the request
 		request.setAttribute("STUDENT_LIST", students);
 		
-		//send to JSP page (view)
+		//send to JSP page
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/list-students.jsp");
 		dispatcher.forward(request, response);
 	}
