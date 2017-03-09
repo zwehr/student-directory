@@ -26,3 +26,14 @@ tr {
  
 tr:nth-child(even) {background: #fff}
 tr:nth-child(odd) {background: #bbb}	
+
+.button {
+	border: 1px solid #666; 
+	border-radius: 5px; 
+	padding: 4px; 
+	font-size: 12px;
+	font-weight: bold;
+	width: 120px; 
+	margin-bottom: 15px;
+	background: #cccccc;
+}
