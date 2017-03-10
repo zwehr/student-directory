@@ -18,16 +18,16 @@ import javax.sql.DataSource;
 @WebServlet("/StudentControllerServlet")
 public class StudentControllerServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
 	private StudentDbUtil studentDbUtil;
-	
-	@Resource(name="jdbc/web_student_tracker")
+
+	@Resource(name = "jdbc/web_student_tracker")
 	private DataSource dataSource;
 
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		
+
 		// create our student db util ... and pass in the conn pool / datasource
 		try {
 			studentDbUtil = new StudentDbUtil(dataSource);
@@ -36,30 +36,67 @@ public class StudentControllerServlet extends HttpServlet {
 		}
 	}
 
-
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		try {
-		// list the students
-		listStudents(request, response);
+			// read "command" parameter
+			String theCommand = request.getParameter("command");
+
+			// if command is missing, just list students
+			if (theCommand == null) {
+				theCommand = "LIST";
+			}
+
+			// route to the appropriate method
+			switch (theCommand) {
+			case "LIST":
+				listStudents(request, response);
+				break;
+
+			case "ADD":
+				addStudent(request, response);
+				break;
+
+			default:
+				listStudents(request, response);
+				break;
+			}
+
 		} catch (Exception exc) {
 			throw new ServletException(exc);
 		}
 	}
 
+	private void addStudent(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		// read info from form data
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String email = request.getParameter("email");
+
+		// create new student object
+		Student newStudent = new Student(firstName, lastName, email);
+
+		// add student to database
+		studentDbUtil.addStudent(newStudent);
+
+		// send back to main page (updated list)
+		listStudents(request, response);
+	}
+
 	private void listStudents(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		//get students from db util
+		// get students from db util
 		List<Student> students = studentDbUtil.getStudents();
-		
-		//add students to the request
+
+		// add students to the request
 		request.setAttribute("STUDENT_LIST", students);
-		
-		//send to JSP page
+
+		// send to JSP page
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/list-students.jsp");
 		dispatcher.forward(request, response);
 	}
-
 }
