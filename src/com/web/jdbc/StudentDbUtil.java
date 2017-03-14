@@ -3,6 +3,7 @@ package com.web.jdbc;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,8 +73,32 @@ public class StudentDbUtil {
 		}
 	}
 
-	public void addStudent(Student newStudent) {
-		// TODO Auto-generated method stub
+	public void addStudent(Student newStudent) throws Exception {
+		Connection myConn = null;
+		PreparedStatement myStmt = null;
+		
+		try {
+			// get db connection
+			myConn = dataSource.getConnection();
+			
+			// create SQL for insert
+			String sql = "insert into student "
+					+ "(first_name, last_name, email) "
+					+ "values (?, ?, ?)";
+			
+			myStmt = myConn.prepareStatement(sql);
+			
+			// set the param values for the student
+			myStmt.setString(1, newStudent.getFirstName());
+			myStmt.setString(2, newStudent.getLastName());
+			myStmt.setString(3, newStudent.getEmail());
+			
+			// execute SQL insert
+			myStmt.execute();
+		}
+		finally {
+			close(myConn, myStmt, null);
+		}
 		
 	}
 }
